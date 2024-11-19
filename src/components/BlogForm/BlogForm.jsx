@@ -1,36 +1,75 @@
 import React, { useState } from "react";
-import ListCheckbox from "./ListCheckbox/ListCheckbox";
+import ListCheckbox from "./ListCheckbox/ListCheckbox"; // Assicurati che questo sia corretto
 
 export default function BlogForm({ onSubmit }) {
-    const [title, setTitle] = useState("");
-    const [author, setAuthor] = useState("");
-    const [status, setStatus] = useState("Draft");
-    const [img, setImg] = useState("");
-    const [content, setContent] = useState('')
-    const [tag, setTag] = useState([])
+    // Stato unificato con tutti i dati del form
+    const [formData, setFormData] = useState({
+        title: "",
+        author: "",
+        status: "draft",  // Aggiunto lo stato per la pubblicazione
+        img: "",
+        content: "",
+        tags: [],  // Array di tags selezionati
+        published: false // Stato per la pubblicazione dell'articolo
+    });
+
     const availableTags = ["Tech", "Lifestyle", "Education", "Entertainment"];
 
+    // Funzione per gestire il cambiamento dei valori
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+
+        if (type === "checkbox") {
+            // Gestisci il cambiamento dei checkbox (tags)
+            setFormData((prevData) => {
+                const newTags = checked
+                    ? [...prevData.tags, value] // Aggiungi tag
+                    : prevData.tags.filter((tag) => tag !== value); // Rimuovi tag
+                return { ...prevData, tags: newTags };
+            });
+        } else if (type === "select-one") {
+            // Gestisci il cambiamento del campo "status"
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: value
+            }));
+        } else if (type === "checkbox") {
+            // Per il checkbox di "published"
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: checked
+            }));
+        } else {
+            // Gestisci gli altri input
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: value
+            }));
+        }
+    };
+
+    // Funzione di submit
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // evita post senza titoli 
-        if (!title.trim()) return;
+        if (!formData.title.trim()) return;
 
+        // Invia i dati al componente genitore
         onSubmit({
             id: Date.now(),
-            title,
-            author,
-            img,
-            content,
-            status,
-            tags: tag
+            ...formData
         });
 
-        // reset dei campi
-        setTitle("");
-        setAuthor("");
-        setStatus("draft");
-        setTag([])
+        // Reset dei campi del form
+        setFormData({
+            title: "",
+            author: "",
+            status: "draft",
+            img: "",
+            content: "",
+            tags: [],
+            published: false
+        });
     };
 
     return (
@@ -38,38 +77,62 @@ export default function BlogForm({ onSubmit }) {
             <div className="container-input">
                 <input
                     type="text"
+                    name="title"
                     placeholder="Title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    value={formData.title}
+                    onChange={handleChange}
                 />
                 <input
                     type="text"
+                    name="author"
                     placeholder="Author"
-                    value={author}
-                    onChange={(e) => setAuthor(e.target.value)}
+                    value={formData.author}
+                    onChange={handleChange}
                 />
                 <input
                     type="text"
+                    name="img"
                     placeholder="Image address"
-                    value={img}
-                    accept="image/png, image/jpeg"
-                    onChange={(e) => setImg(e.target.value)}
+                    value={formData.img}
+                    onChange={handleChange}
                 />
             </div>
             <div className="container-input">
-                <input
-                    type="text"
+                <textarea
+                    name="content"
                     placeholder="Content"
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
+                    value={formData.content}
+                    onChange={handleChange}
                 />
-                <select value={status} onChange={(e) => setStatus(e.target.value)}>
+                <select
+                    name="status"
+                    value={formData.status}
+                    onChange={handleChange}
+                >
                     <option value="draft">Draft</option>
                     <option value="published">Published</option>
                 </select>
+
                 <button type="submit">Add Article</button>
             </div>
-            <ListCheckbox availableTags={availableTags} tag={tag} setTag={setTag} />
+            {/* Gestione tags via component ListCheckbox */}
+            <ListCheckbox
+                availableTags={availableTags}
+                tags={formData.tags}
+                setTags={(tags) => setFormData({ ...formData, tags })}
+            />
+
+            {/* Gestione stato di pubblicazione */}
+            <label>
+                <input
+                    type="checkbox"
+                    name="published"
+                    checked={formData.published}
+                    onChange={handleChange}
+                    className="publish-article"
+                />
+                Publish Article
+            </label>
         </form>
     );
 }
