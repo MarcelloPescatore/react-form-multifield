@@ -43,10 +43,6 @@ form {
             margin-right: 0.5rem;
         }
     }
-
-    .publish-article{
-        margin-right: 0.5rem;
-    }
 }
 
 .list{
@@ -81,6 +77,10 @@ form {
                 color: white;
                 border-radius: 4px;
                 cursor: pointer;
+            }
+
+            .publish{
+                background-color: green;
             }
         }
 

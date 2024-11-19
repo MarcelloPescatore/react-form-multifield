@@ -25,9 +25,17 @@ export default function BlogList({ articles, onDelete, onUpdate }) {
 
     const handleUpdate = (id) => {
         // salva la modifica
-        onUpdate(id, { title: editTitle, author: editAuthor, img: editImg, content: editContent, status: editStatus});
+        onUpdate(id, { title: editTitle, author: editAuthor, img: editImg, content: editContent, status: editStatus });
         // esce dalla modialità modifica
         setEditingId(null);
+    };
+
+    const handlePublish = (id) => {
+        const articleToUpdate = articles.find(article => article.id === id);
+        if (articleToUpdate.status === "draft") {
+            // Cambia lo stato a 'published'
+            onUpdate(id, { status: "published" });
+        }
     };
 
     return (
@@ -73,10 +81,19 @@ export default function BlogList({ articles, onDelete, onUpdate }) {
                             <p>Status: {article.status}</p>
                             <p>Content: {article.content}</p>
                             <p>Tags: {(article.tags || []).join(', ')}</p>
+
+
+
                             <div className="buttons">
                                 <button onClick={() => handleEdit(article)}>Edit</button>
                                 {/* cancella la modifica */}
                                 <button onClick={() => onDelete(article.id)}>Delete</button>
+                                {/* Bottone per cambiare stato da 'draft' a 'published' */}
+                                {article.status === "draft" && (
+                                    <button className="publish" onClick={() => handlePublish(article.id)}>
+                                        Publish
+                                    </button>
+                                )}
                             </div>
                         </>
                     )}

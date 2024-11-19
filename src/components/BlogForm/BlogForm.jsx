@@ -121,18 +121,6 @@ export default function BlogForm({ onSubmit }) {
                 tags={formData.tags}
                 setTags={(tags) => setFormData({ ...formData, tags })}
             />
-
-            {/* Gestione stato di pubblicazione */}
-            <label>
-                <input
-                    type="checkbox"
-                    name="published"
-                    checked={formData.published}
-                    onChange={handleChange}
-                    className="publish-article"
-                />
-                Publish Article
-            </label>
         </form>
     );
 }
